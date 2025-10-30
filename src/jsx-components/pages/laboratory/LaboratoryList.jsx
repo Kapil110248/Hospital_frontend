@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Form, Alert } from 'react-bootstrap';
-import { FlaskConical, Plus, Edit, Trash2, Eye } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { Card } from '../../common/Card';
-import Button from '../../common/Button';
-import DataTable from '../../common/DataTable';
-import Modal from '../../common/Modal';
-import { labService, patientService, staffService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Form, Alert } from "react-bootstrap";
+import { FlaskConical, Plus, Edit, Trash2, Eye } from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { Card } from "../../common/Card";
+import Button from "../../common/Button";
+import DataTable from "../../common/DataTable";
+import Modal from "../../common/Modal";
+import {
+  labService,
+  patientService,
+  staffService,
+} from "../../../jsx-services/api";
 
 export const LaboratoryList = () => {
   const [labOrders, setLabOrders] = useState([]);
@@ -14,27 +18,27 @@ export const LaboratoryList = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    testType: '',
-    testName: '',
-    priority: 'ROUTINE',
-    notes: '',
+    patientId: "",
+    doctorId: "",
+    testType: "",
+    testName: "",
+    priority: "ROUTINE",
+    notes: "",
   });
 
   const testTypes = [
-    'Blood Test',
-    'Urine Test',
-    'Stool Test',
-    'X-Ray',
-    'CT Scan',
-    'MRI',
-    'Ultrasound',
-    'ECG',
-    'Other',
+    "Blood Test",
+    "Urine Test",
+    "Stool Test",
+    "X-Ray",
+    "CT Scan",
+    "MRI",
+    "Ultrasound",
+    "ECG",
+    "Other",
   ];
 
   useEffect(() => {
@@ -54,8 +58,8 @@ export const LaboratoryList = () => {
       setPatients(patData);
       setDoctors(docData);
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error("Error loading data:", err);
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -63,8 +67,8 @@ export const LaboratoryList = () => {
 
   const handleCreateLabOrder = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const labOrderData = {
@@ -74,83 +78,93 @@ export const LaboratoryList = () => {
         test_name: formData.testName,
         priority: formData.priority,
         notes: formData.notes,
-        status: 'REQUESTED',
+        status: "REQUESTED",
       };
 
       await labService.create(labOrderData);
-      setSuccess('Lab order created successfully!');
+      setSuccess("Lab order created successfully!");
       setShowModal(false);
       loadData();
       resetForm();
 
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      console.error('Error creating lab order:', err);
-      setError(err.message || 'Failed to create lab order');
+      console.error("Error creating lab order:", err);
+      setError(err.message || "Failed to create lab order");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      patientId: '',
-      doctorId: '',
-      testType: '',
-      testName: '',
-      priority: 'ROUTINE',
-      notes: '',
+      patientId: "",
+      doctorId: "",
+      testType: "",
+      testName: "",
+      priority: "ROUTINE",
+      notes: "",
     });
   };
 
   const columns = [
     {
-      header: 'Order No',
-      key: 'id',
+      header: "Order No",
+      key: "id",
       render: (row) => `LAB-${row.id?.substring(0, 8).toUpperCase()}`,
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
     },
     {
-      header: 'Test Type',
-      key: 'test_type',
+      header: "Test Type",
+      key: "test_type",
     },
     {
-      header: 'Test Name',
-      key: 'test_name',
+      header: "Test Name",
+      key: "test_name",
     },
     {
-      header: 'Priority',
+      header: "Priority",
       render: (row) => {
         const variants = {
-          URGENT: 'danger',
-          ROUTINE: 'primary',
-          STAT: 'warning',
+          URGENT: "danger",
+          ROUTINE: "primary",
+          STAT: "warning",
         };
-        return <Badge bg={variants[row.priority] || 'secondary'}>{row.priority}</Badge>;
+        return (
+          <Badge bg={variants[row.priority] || "secondary"}>
+            {row.priority}
+          </Badge>
+        );
       },
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          REQUESTED: 'secondary',
-          SAMPLE_COLLECTED: 'info',
-          IN_PROGRESS: 'warning',
-          COMPLETED: 'success',
-          CANCELLED: 'danger',
+          REQUESTED: "secondary",
+          SAMPLE_COLLECTED: "info",
+          IN_PROGRESS: "warning",
+          COMPLETED: "success",
+          CANCELLED: "danger",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-1">
           <Button size="sm" variant="outline-primary">
@@ -180,13 +194,13 @@ export const LaboratoryList = () => {
       </Row>
 
       {success && (
-        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+        <Alert variant="success" dismissible onClose={() => setSuccess("")}>
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="danger" dismissible onClose={() => setError('')}>
+        <Alert variant="danger" dismissible onClose={() => setError("")}>
           {error}
         </Alert>
       )}
@@ -214,10 +228,14 @@ export const LaboratoryList = () => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Patient <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Patient <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, patientId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Patient</option>
@@ -232,10 +250,14 @@ export const LaboratoryList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Doctor <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Doctor <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, doctorId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Doctor</option>
@@ -250,10 +272,14 @@ export const LaboratoryList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Test Type <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Test Type <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.testType}
-                  onChange={(e) => setFormData({ ...formData, testType: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, testType: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Test Type</option>
@@ -268,11 +294,15 @@ export const LaboratoryList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Test Name <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Test Name <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   value={formData.testName}
-                  onChange={(e) => setFormData({ ...formData, testName: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, testName: e.target.value })
+                  }
                   placeholder="e.g., Complete Blood Count"
                   required
                 />
@@ -284,7 +314,9 @@ export const LaboratoryList = () => {
                 <Form.Label>Priority</Form.Label>
                 <Form.Select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, priority: e.target.value })
+                  }
                 >
                   <option value="ROUTINE">Routine</option>
                   <option value="URGENT">Urgent</option>
@@ -300,7 +332,9 @@ export const LaboratoryList = () => {
                   as="textarea"
                   rows={3}
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
                   placeholder="Enter clinical notes or special instructions..."
                 />
               </Form.Group>

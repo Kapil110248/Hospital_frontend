@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Form } from 'react-bootstrap';
-import { Calendar, Plus, Edit, Trash2 } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { Card } from '../../common/Card';
-import Button from '../../common/Button';
-import DataTable from '../../common/DataTable';
-import Modal from '../../common/Modal';
-import { appointmentService, patientService, staffService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Form } from "react-bootstrap";
+import { Calendar, Plus, Edit, Trash2 } from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { Card } from "../../common/Card";
+import Button from "../../common/Button";
+import DataTable from "../../common/DataTable";
+import Modal from "../../common/Modal";
+import {
+  appointmentService,
+  patientService,
+  staffService,
+} from "../../../jsx-services/api";
 
 export const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
@@ -15,12 +19,12 @@ export const AppointmentList = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    scheduledAt: '',
+    patientId: "",
+    doctorId: "",
+    scheduledAt: "",
     duration: 30,
-    type: 'CONSULTATION',
-    reason: '',
+    type: "CONSULTATION",
+    reason: "",
   });
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export const AppointmentList = () => {
       setPatients(patientData);
       setDoctors(doctorData);
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error("Error loading data:", error);
     } finally {
       setLoading(false);
     }
@@ -56,65 +60,72 @@ export const AppointmentList = () => {
         duration: parseInt(formData.duration),
         type: formData.type,
         reason: formData.reason,
-        status: 'SCHEDULED',
+        status: "SCHEDULED",
       });
       setShowModal(false);
       loadData();
       setFormData({
-        patientId: '',
-        doctorId: '',
-        scheduledAt: '',
+        patientId: "",
+        doctorId: "",
+        scheduledAt: "",
         duration: 30,
-        type: 'CONSULTATION',
-        reason: '',
+        type: "CONSULTATION",
+        reason: "",
       });
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      console.error("Error creating appointment:", error);
     }
   };
 
   const columns = [
     {
-      header: 'Token',
-      key: 'token_number',
+      header: "Token",
+      key: "token_number",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
     },
     {
-      header: 'Date & Time',
-      render: (row) => new Date(row.scheduled_at).toLocaleString('en-US', {
-        dateStyle: 'short',
-        timeStyle: 'short'
-      }),
+      header: "Date & Time",
+      render: (row) =>
+        new Date(row.scheduled_at).toLocaleString("en-US", {
+          dateStyle: "short",
+          timeStyle: "short",
+        }),
     },
     {
-      header: 'Type',
-      key: 'type',
+      header: "Type",
+      key: "type",
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          SCHEDULED: 'secondary',
-          CHECKED_IN: 'info',
-          IN_CONSULTATION: 'warning',
-          COMPLETED: 'success',
-          CANCELLED: 'danger',
-          NO_SHOW: 'dark',
+          SCHEDULED: "secondary",
+          CHECKED_IN: "info",
+          IN_CONSULTATION: "warning",
+          COMPLETED: "success",
+          CANCELLED: "danger",
+          NO_SHOW: "dark",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-1">
           <Button size="sm" variant="outline-primary">
@@ -133,7 +144,9 @@ export const AppointmentList = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Appointments</h2>
-          <p className="text-muted">Manage patient appointments and schedules</p>
+          <p className="text-muted">
+            Manage patient appointments and schedules
+          </p>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowModal(true)}>
@@ -163,10 +176,14 @@ export const AppointmentList = () => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Patient <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Patient <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, patientId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Patient</option>
@@ -181,10 +198,14 @@ export const AppointmentList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Doctor <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Doctor <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, doctorId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Doctor</option>
@@ -199,11 +220,15 @@ export const AppointmentList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Date & Time <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Date & Time <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   type="datetime-local"
                   value={formData.scheduledAt}
-                  onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, scheduledAt: e.target.value })
+                  }
                   required
                 />
               </Form.Group>
@@ -215,7 +240,9 @@ export const AppointmentList = () => {
                 <Form.Control
                   type="number"
                   value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, duration: e.target.value })
+                  }
                 />
               </Form.Group>
             </Col>
@@ -225,7 +252,9 @@ export const AppointmentList = () => {
                 <Form.Label>Type</Form.Label>
                 <Form.Select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, type: e.target.value })
+                  }
                 >
                   <option value="CONSULTATION">Consultation</option>
                   <option value="FOLLOW_UP">Follow Up</option>
@@ -242,7 +271,9 @@ export const AppointmentList = () => {
                   as="textarea"
                   rows={3}
                   value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, reason: e.target.value })
+                  }
                   placeholder="Enter reason for appointment..."
                 />
               </Form.Group>

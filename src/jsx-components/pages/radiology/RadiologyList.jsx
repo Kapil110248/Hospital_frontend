@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Form, Alert } from 'react-bootstrap';
-import { Radio, Plus, Edit, Trash2, Eye } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { Card } from '../../common/Card';
-import Button from '../../common/Button';
-import DataTable from '../../common/DataTable';
-import Modal from '../../common/Modal';
-import { radiologyService, patientService, staffService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Form, Alert } from "react-bootstrap";
+import { Radio, Plus, Edit, Trash2, Eye } from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { Card } from "../../common/Card";
+import Button from "../../common/Button";
+import DataTable from "../../common/DataTable";
+import Modal from "../../common/Modal";
+import {
+  radiologyService,
+  patientService,
+  staffService,
+} from "../../../jsx-services/api";
 
 export const RadiologyList = () => {
   const [radiologyOrders, setRadiologyOrders] = useState([]);
@@ -14,28 +18,28 @@ export const RadiologyList = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    scanType: '',
-    bodyPart: '',
-    priority: 'ROUTINE',
-    clinicalHistory: '',
-    instructions: '',
+    patientId: "",
+    doctorId: "",
+    scanType: "",
+    bodyPart: "",
+    priority: "ROUTINE",
+    clinicalHistory: "",
+    instructions: "",
   });
 
   const scanTypes = [
-    'X-Ray',
-    'CT Scan',
-    'MRI',
-    'Ultrasound',
-    'Fluoroscopy',
-    'Mammography',
-    'PET Scan',
-    'Nuclear Medicine',
-    'Other',
+    "X-Ray",
+    "CT Scan",
+    "MRI",
+    "Ultrasound",
+    "Fluoroscopy",
+    "Mammography",
+    "PET Scan",
+    "Nuclear Medicine",
+    "Other",
   ];
 
   useEffect(() => {
@@ -55,8 +59,8 @@ export const RadiologyList = () => {
       setPatients(patData);
       setDoctors(docData);
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error("Error loading data:", err);
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -64,8 +68,8 @@ export const RadiologyList = () => {
 
   const handleCreateRadiologyOrder = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const radiologyOrderData = {
@@ -76,84 +80,94 @@ export const RadiologyList = () => {
         priority: formData.priority,
         clinical_history: formData.clinicalHistory,
         instructions: formData.instructions,
-        status: 'REQUESTED',
+        status: "REQUESTED",
       };
 
       await radiologyService.create(radiologyOrderData);
-      setSuccess('Radiology order created successfully!');
+      setSuccess("Radiology order created successfully!");
       setShowModal(false);
       loadData();
       resetForm();
 
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      console.error('Error creating radiology order:', err);
-      setError(err.message || 'Failed to create radiology order');
+      console.error("Error creating radiology order:", err);
+      setError(err.message || "Failed to create radiology order");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      patientId: '',
-      doctorId: '',
-      scanType: '',
-      bodyPart: '',
-      priority: 'ROUTINE',
-      clinicalHistory: '',
-      instructions: '',
+      patientId: "",
+      doctorId: "",
+      scanType: "",
+      bodyPart: "",
+      priority: "ROUTINE",
+      clinicalHistory: "",
+      instructions: "",
     });
   };
 
   const columns = [
     {
-      header: 'Order No',
-      key: 'id',
+      header: "Order No",
+      key: "id",
       render: (row) => `RAD-${row.id?.substring(0, 8).toUpperCase()}`,
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
     },
     {
-      header: 'Scan Type',
-      key: 'scan_type',
+      header: "Scan Type",
+      key: "scan_type",
     },
     {
-      header: 'Body Part',
-      key: 'body_part',
+      header: "Body Part",
+      key: "body_part",
     },
     {
-      header: 'Priority',
+      header: "Priority",
       render: (row) => {
         const variants = {
-          URGENT: 'danger',
-          ROUTINE: 'primary',
-          STAT: 'warning',
+          URGENT: "danger",
+          ROUTINE: "primary",
+          STAT: "warning",
         };
-        return <Badge bg={variants[row.priority] || 'secondary'}>{row.priority}</Badge>;
+        return (
+          <Badge bg={variants[row.priority] || "secondary"}>
+            {row.priority}
+          </Badge>
+        );
       },
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          REQUESTED: 'secondary',
-          SCHEDULED: 'info',
-          IN_PROGRESS: 'warning',
-          COMPLETED: 'success',
-          CANCELLED: 'danger',
+          REQUESTED: "secondary",
+          SCHEDULED: "info",
+          IN_PROGRESS: "warning",
+          COMPLETED: "success",
+          CANCELLED: "danger",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-1">
           <Button size="sm" variant="outline-primary">
@@ -172,7 +186,9 @@ export const RadiologyList = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Radiology</h2>
-          <p className="text-muted">Manage radiology orders and imaging reports</p>
+          <p className="text-muted">
+            Manage radiology orders and imaging reports
+          </p>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowModal(true)}>
@@ -183,13 +199,13 @@ export const RadiologyList = () => {
       </Row>
 
       {success && (
-        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+        <Alert variant="success" dismissible onClose={() => setSuccess("")}>
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="danger" dismissible onClose={() => setError('')}>
+        <Alert variant="danger" dismissible onClose={() => setError("")}>
           {error}
         </Alert>
       )}
@@ -217,10 +233,14 @@ export const RadiologyList = () => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Patient <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Patient <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, patientId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Patient</option>
@@ -235,10 +255,14 @@ export const RadiologyList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Doctor <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Doctor <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, doctorId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Doctor</option>
@@ -253,10 +277,14 @@ export const RadiologyList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Scan Type <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Scan Type <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.scanType}
-                  onChange={(e) => setFormData({ ...formData, scanType: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, scanType: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Scan Type</option>
@@ -271,11 +299,15 @@ export const RadiologyList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Body Part <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Body Part <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   value={formData.bodyPart}
-                  onChange={(e) => setFormData({ ...formData, bodyPart: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bodyPart: e.target.value })
+                  }
                   placeholder="e.g., Chest, Head, Abdomen"
                   required
                 />
@@ -287,7 +319,9 @@ export const RadiologyList = () => {
                 <Form.Label>Priority</Form.Label>
                 <Form.Select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, priority: e.target.value })
+                  }
                 >
                   <option value="ROUTINE">Routine</option>
                   <option value="URGENT">Urgent</option>
@@ -298,12 +332,19 @@ export const RadiologyList = () => {
 
             <Col md={12}>
               <Form.Group className="mb-3">
-                <Form.Label>Clinical History <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Clinical History <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
                   value={formData.clinicalHistory}
-                  onChange={(e) => setFormData({ ...formData, clinicalHistory: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      clinicalHistory: e.target.value,
+                    })
+                  }
                   placeholder="Enter relevant clinical history..."
                   required
                 />
@@ -317,7 +358,9 @@ export const RadiologyList = () => {
                   as="textarea"
                   rows={2}
                   value={formData.instructions}
-                  onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, instructions: e.target.value })
+                  }
                   placeholder="Enter any special instructions or contrast requirements..."
                 />
               </Form.Group>

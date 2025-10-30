@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, ListGroup } from 'react-bootstrap';
-import { Calendar, Users, FileText, Clock, Activity } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { StatsCard } from '../../common/Card';
-import { Card } from '../../common/Card';
-import DataTable from '../../common/DataTable';
-import Button from '../../common/Button';
-import { appointmentService, patientService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, ListGroup } from "react-bootstrap";
+import { Calendar, Users, FileText, Clock, Activity } from "../../../lib/icons";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { StatsCard } from "../../common/Card";
+import { Card } from "../../common/Card";
+import DataTable from "../../common/DataTable";
+import Button from "../../common/Button";
+import { appointmentService, patientService } from "../../../jsx-services/api";
 
 export const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -36,9 +36,11 @@ export const DoctorDashboard = () => {
       setTodayAppointments(appointments);
       setRecentPatients(patients.slice(0, 5));
 
-      const completed = appointments.filter(a => a.status === 'COMPLETED').length;
-      const pending = appointments.filter(a =>
-        ['SCHEDULED', 'CHECKED_IN', 'IN_CONSULTATION'].includes(a.status)
+      const completed = appointments.filter(
+        (a) => a.status === "COMPLETED"
+      ).length;
+      const pending = appointments.filter((a) =>
+        ["SCHEDULED", "CHECKED_IN", "IN_CONSULTATION"].includes(a.status)
       ).length;
 
       setStats({
@@ -48,7 +50,7 @@ export const DoctorDashboard = () => {
         totalPatients: patients.length,
       });
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -56,56 +58,63 @@ export const DoctorDashboard = () => {
 
   const handleStartConsultation = async (appointmentId) => {
     try {
-      await appointmentService.update(appointmentId, { status: 'IN_CONSULTATION' });
+      await appointmentService.update(appointmentId, {
+        status: "IN_CONSULTATION",
+      });
       loadDashboardData();
     } catch (error) {
-      console.error('Error starting consultation:', error);
+      console.error("Error starting consultation:", error);
     }
   };
 
   const handleCompleteConsultation = async (appointmentId) => {
     try {
-      await appointmentService.update(appointmentId, { status: 'COMPLETED' });
+      await appointmentService.update(appointmentId, { status: "COMPLETED" });
       loadDashboardData();
     } catch (error) {
-      console.error('Error completing consultation:', error);
+      console.error("Error completing consultation:", error);
     }
   };
 
   const appointmentColumns = [
     {
-      header: 'Token',
-      key: 'token_number',
+      header: "Token",
+      key: "token_number",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Time',
-      render: (row) => new Date(row.scheduled_at).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+      header: "Time",
+      render: (row) =>
+        new Date(row.scheduled_at).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          SCHEDULED: 'secondary',
-          CHECKED_IN: 'info',
-          IN_CONSULTATION: 'warning',
-          COMPLETED: 'success',
+          SCHEDULED: "secondary",
+          CHECKED_IN: "info",
+          IN_CONSULTATION: "warning",
+          COMPLETED: "success",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-1">
-          {row.status === 'CHECKED_IN' && (
+          {row.status === "CHECKED_IN" && (
             <Button
               size="sm"
               variant="success"
@@ -114,7 +123,7 @@ export const DoctorDashboard = () => {
               Start
             </Button>
           )}
-          {row.status === 'IN_CONSULTATION' && (
+          {row.status === "IN_CONSULTATION" && (
             <Button
               size="sm"
               variant="primary"
@@ -133,7 +142,9 @@ export const DoctorDashboard = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Doctor's Dashboard</h2>
-          <p className="text-muted">Manage your appointments and patient care</p>
+          <p className="text-muted">
+            Manage your appointments and patient care
+          </p>
         </Col>
       </Row>
 
@@ -190,21 +201,21 @@ export const DoctorDashboard = () => {
             <div className="d-grid gap-2">
               <Button
                 variant="outline-primary"
-                onClick={() => navigate('/prescriptions')}
+                onClick={() => navigate("/prescriptions")}
               >
                 <FileText size={18} className="me-2" />
                 Write Prescription
               </Button>
               <Button
                 variant="outline-success"
-                onClick={() => navigate('/laboratory')}
+                onClick={() => navigate("/laboratory")}
               >
                 <Activity size={18} className="me-2" />
                 Order Lab Test
               </Button>
               <Button
                 variant="outline-info"
-                onClick={() => navigate('/patients')}
+                onClick={() => navigate("/patients")}
               >
                 <Users size={18} className="me-2" />
                 View Patient History
@@ -218,7 +229,7 @@ export const DoctorDashboard = () => {
                 <div className="d-flex justify-content-between align-items-start mb-2">
                   <div>
                     <h6 className="mb-1">
-                      {todayAppointments[0].patient?.first_name}{' '}
+                      {todayAppointments[0].patient?.first_name}{" "}
                       {todayAppointments[0].patient?.last_name}
                     </h6>
                     <small className="text-muted">
@@ -229,14 +240,18 @@ export const DoctorDashboard = () => {
                 </div>
                 <div className="d-flex align-items-center text-muted small">
                   <Clock size={14} className="me-1" />
-                  {new Date(todayAppointments[0].scheduled_at).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                  {new Date(
+                    todayAppointments[0].scheduled_at
+                  ).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </div>
               </div>
             ) : (
-              <p className="text-muted text-center py-3">No upcoming appointments</p>
+              <p className="text-muted text-center py-3">
+                No upcoming appointments
+              </p>
             )}
           </Card>
         </Col>

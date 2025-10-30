@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge } from 'react-bootstrap';
-import { UserPlus, Eye, Edit, Trash2 } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { Card } from '../../common/Card';
-import Button from '../../common/Button';
-import DataTable from '../../common/DataTable';
-import Modal from '../../common/Modal';
-import PatientRegistrationForm from '../../forms/PatientRegistrationForm';
-import { patientService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge } from "react-bootstrap";
+import { UserPlus, Eye, Edit, Trash2 } from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { Card } from "../../common/Card";
+import Button from "../../common/Button";
+import DataTable from "../../common/DataTable";
+import Modal from "../../common/Modal";
+import PatientRegistrationForm from "../../forms/PatientRegistrationForm";
+import { patientService } from "../../../jsx-services/api";
 
 export const PatientList = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [modalMode, setModalMode] = useState('create');
+  const [modalMode, setModalMode] = useState("create");
 
   useEffect(() => {
     loadPatients();
@@ -26,7 +26,7 @@ export const PatientList = () => {
       const data = await patientService.getAll();
       setPatients(data);
     } catch (error) {
-      console.error('Error loading patients:', error);
+      console.error("Error loading patients:", error);
     } finally {
       setLoading(false);
     }
@@ -34,13 +34,13 @@ export const PatientList = () => {
 
   const handleCreate = () => {
     setSelectedPatient(null);
-    setModalMode('create');
+    setModalMode("create");
     setShowModal(true);
   };
 
   const handleEdit = (patient) => {
     setSelectedPatient(patient);
-    setModalMode('edit');
+    setModalMode("edit");
     setShowModal(true);
   };
 
@@ -51,52 +51,52 @@ export const PatientList = () => {
 
   const getStatusBadge = (status) => {
     const variants = {
-      OPD: 'primary',
-      IPD: 'warning',
-      DISCHARGED: 'success',
-      EMERGENCY: 'danger',
+      OPD: "primary",
+      IPD: "warning",
+      DISCHARGED: "success",
+      EMERGENCY: "danger",
     };
-    return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
+    return <Badge bg={variants[status] || "secondary"}>{status}</Badge>;
   };
 
   const columns = [
     {
-      header: 'UPID',
-      key: 'upid',
-      minWidth: '120px',
+      header: "UPID",
+      key: "upid",
+      minWidth: "120px",
     },
     {
-      header: 'Name',
+      header: "Name",
       render: (row) => `${row.first_name} ${row.last_name}`,
-      minWidth: '180px',
+      minWidth: "180px",
     },
     {
-      header: 'Phone',
-      key: 'phone',
-      minWidth: '130px',
+      header: "Phone",
+      key: "phone",
+      minWidth: "130px",
     },
     {
-      header: 'Gender',
-      key: 'gender',
-      minWidth: '100px',
+      header: "Gender",
+      key: "gender",
+      minWidth: "100px",
     },
     {
-      header: 'Age',
-      key: 'age',
-      minWidth: '80px',
+      header: "Age",
+      key: "age",
+      minWidth: "80px",
     },
     {
-      header: 'Blood Group',
-      key: 'blood_group',
-      minWidth: '120px',
+      header: "Blood Group",
+      key: "blood_group",
+      minWidth: "120px",
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => getStatusBadge(row.status),
-      minWidth: '120px',
+      minWidth: "120px",
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-2">
           <Button
@@ -114,7 +114,7 @@ export const PatientList = () => {
           </Button>
         </div>
       ),
-      minWidth: '120px',
+      minWidth: "120px",
     },
   ];
 
@@ -146,7 +146,7 @@ export const PatientList = () => {
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
-        title={modalMode === 'create' ? 'Register New Patient' : 'Edit Patient'}
+        title={modalMode === "create" ? "Register New Patient" : "Edit Patient"}
         size="xl"
       >
         <PatientRegistrationForm

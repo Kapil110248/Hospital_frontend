@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Form, Alert } from 'react-bootstrap';
-import { FileText, Plus, Edit, Trash2, Eye } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { Card } from '../../common/Card';
-import Button from '../../common/Button';
-import DataTable from '../../common/DataTable';
-import Modal from '../../common/Modal';
-import { prescriptionService, patientService, staffService, medicineService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Form, Alert } from "react-bootstrap";
+import { FileText, Plus, Edit, Trash2, Eye } from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { Card } from "../../common/Card";
+import Button from "../../common/Button";
+import DataTable from "../../common/DataTable";
+import Modal from "../../common/Modal";
+import {
+  prescriptionService,
+  patientService,
+  staffService,
+  medicineService,
+} from "../../../jsx-services/api";
 
 export const PrescriptionList = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -15,14 +20,22 @@ export const PrescriptionList = () => {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    diagnosis: '',
-    notes: '',
-    medicineItems: [{ medicineId: '', dosage: '', frequency: '', duration: '', instructions: '' }],
+    patientId: "",
+    doctorId: "",
+    diagnosis: "",
+    notes: "",
+    medicineItems: [
+      {
+        medicineId: "",
+        dosage: "",
+        frequency: "",
+        duration: "",
+        instructions: "",
+      },
+    ],
   });
 
   useEffect(() => {
@@ -44,8 +57,8 @@ export const PrescriptionList = () => {
       setDoctors(docData);
       setMedicines(medData);
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error("Error loading data:", err);
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -53,8 +66,8 @@ export const PrescriptionList = () => {
 
   const handleCreatePrescription = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const prescriptionData = {
@@ -62,37 +75,54 @@ export const PrescriptionList = () => {
         doctor_id: formData.doctorId,
         diagnosis: formData.diagnosis,
         notes: formData.notes,
-        status: 'PENDING',
-        medicines: formData.medicineItems.filter(item => item.medicineId),
+        status: "PENDING",
+        medicines: formData.medicineItems.filter((item) => item.medicineId),
       };
 
       await prescriptionService.create(prescriptionData);
-      setSuccess('Prescription created successfully!');
+      setSuccess("Prescription created successfully!");
       setShowModal(false);
       loadData();
       resetForm();
 
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      console.error('Error creating prescription:', err);
-      setError(err.message || 'Failed to create prescription');
+      console.error("Error creating prescription:", err);
+      setError(err.message || "Failed to create prescription");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      patientId: '',
-      doctorId: '',
-      diagnosis: '',
-      notes: '',
-      medicineItems: [{ medicineId: '', dosage: '', frequency: '', duration: '', instructions: '' }],
+      patientId: "",
+      doctorId: "",
+      diagnosis: "",
+      notes: "",
+      medicineItems: [
+        {
+          medicineId: "",
+          dosage: "",
+          frequency: "",
+          duration: "",
+          instructions: "",
+        },
+      ],
     });
   };
 
   const addMedicineItem = () => {
     setFormData({
       ...formData,
-      medicineItems: [...formData.medicineItems, { medicineId: '', dosage: '', frequency: '', duration: '', instructions: '' }],
+      medicineItems: [
+        ...formData.medicineItems,
+        {
+          medicineId: "",
+          dosage: "",
+          frequency: "",
+          duration: "",
+          instructions: "",
+        },
+      ],
     });
   };
 
@@ -109,41 +139,47 @@ export const PrescriptionList = () => {
 
   const columns = [
     {
-      header: 'Prescription No',
-      key: 'id',
+      header: "Prescription No",
+      key: "id",
       render: (row) => `RX-${row.id?.substring(0, 8).toUpperCase()}`,
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
     },
     {
-      header: 'Diagnosis',
-      key: 'diagnosis',
+      header: "Diagnosis",
+      key: "diagnosis",
     },
     {
-      header: 'Date',
+      header: "Date",
       render: (row) => new Date(row.created_at).toLocaleDateString(),
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          PENDING: 'warning',
-          DISPENSED: 'success',
-          CANCELLED: 'danger',
+          PENDING: "warning",
+          DISPENSED: "success",
+          CANCELLED: "danger",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <div className="d-flex gap-1">
           <Button size="sm" variant="outline-primary">
@@ -165,7 +201,9 @@ export const PrescriptionList = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Prescriptions</h2>
-          <p className="text-muted">Manage patient prescriptions and medications</p>
+          <p className="text-muted">
+            Manage patient prescriptions and medications
+          </p>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowModal(true)}>
@@ -176,13 +214,13 @@ export const PrescriptionList = () => {
       </Row>
 
       {success && (
-        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+        <Alert variant="success" dismissible onClose={() => setSuccess("")}>
           {success}
         </Alert>
       )}
 
       {error && (
-        <Alert variant="danger" dismissible onClose={() => setError('')}>
+        <Alert variant="danger" dismissible onClose={() => setError("")}>
           {error}
         </Alert>
       )}
@@ -210,10 +248,14 @@ export const PrescriptionList = () => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Patient <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Patient <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.patientId}
-                  onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, patientId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Patient</option>
@@ -228,10 +270,14 @@ export const PrescriptionList = () => {
 
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Doctor <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Doctor <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Select
                   value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, doctorId: e.target.value })
+                  }
                   required
                 >
                   <option value="">Select Doctor</option>
@@ -246,12 +292,16 @@ export const PrescriptionList = () => {
 
             <Col md={12}>
               <Form.Group className="mb-3">
-                <Form.Label>Diagnosis <span className="text-danger">*</span></Form.Label>
+                <Form.Label>
+                  Diagnosis <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
                   value={formData.diagnosis}
-                  onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, diagnosis: e.target.value })
+                  }
                   placeholder="Enter diagnosis..."
                   required
                 />
@@ -268,7 +318,13 @@ export const PrescriptionList = () => {
                         <Form.Label>Medicine</Form.Label>
                         <Form.Select
                           value={item.medicineId}
-                          onChange={(e) => updateMedicineItem(index, 'medicineId', e.target.value)}
+                          onChange={(e) =>
+                            updateMedicineItem(
+                              index,
+                              "medicineId",
+                              e.target.value
+                            )
+                          }
                         >
                           <option value="">Select Medicine</option>
                           {medicines.map((med) => (
@@ -285,7 +341,9 @@ export const PrescriptionList = () => {
                         <Form.Control
                           type="text"
                           value={item.dosage}
-                          onChange={(e) => updateMedicineItem(index, 'dosage', e.target.value)}
+                          onChange={(e) =>
+                            updateMedicineItem(index, "dosage", e.target.value)
+                          }
                           placeholder="e.g., 1 tablet"
                         />
                       </Form.Group>
@@ -296,7 +354,13 @@ export const PrescriptionList = () => {
                         <Form.Control
                           type="text"
                           value={item.frequency}
-                          onChange={(e) => updateMedicineItem(index, 'frequency', e.target.value)}
+                          onChange={(e) =>
+                            updateMedicineItem(
+                              index,
+                              "frequency",
+                              e.target.value
+                            )
+                          }
                           placeholder="e.g., 3 times/day"
                         />
                       </Form.Group>
@@ -307,7 +371,13 @@ export const PrescriptionList = () => {
                         <Form.Control
                           type="text"
                           value={item.duration}
-                          onChange={(e) => updateMedicineItem(index, 'duration', e.target.value)}
+                          onChange={(e) =>
+                            updateMedicineItem(
+                              index,
+                              "duration",
+                              e.target.value
+                            )
+                          }
                           placeholder="e.g., 7 days"
                         />
                       </Form.Group>
@@ -318,7 +388,13 @@ export const PrescriptionList = () => {
                         <Form.Control
                           type="text"
                           value={item.instructions}
-                          onChange={(e) => updateMedicineItem(index, 'instructions', e.target.value)}
+                          onChange={(e) =>
+                            updateMedicineItem(
+                              index,
+                              "instructions",
+                              e.target.value
+                            )
+                          }
                           placeholder="e.g., After meals"
                         />
                       </Form.Group>
@@ -335,7 +411,11 @@ export const PrescriptionList = () => {
                   )}
                 </div>
               ))}
-              <Button variant="outline-primary" size="sm" onClick={addMedicineItem}>
+              <Button
+                variant="outline-primary"
+                size="sm"
+                onClick={addMedicineItem}
+              >
                 + Add Medicine
               </Button>
             </Col>
@@ -347,7 +427,9 @@ export const PrescriptionList = () => {
                   as="textarea"
                   rows={2}
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
                   placeholder="Enter any additional notes..."
                 />
               </Form.Group>

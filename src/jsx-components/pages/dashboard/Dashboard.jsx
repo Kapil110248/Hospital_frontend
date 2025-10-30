@@ -1,11 +1,21 @@
-import { useState, useEffect } from 'react';
-import { Row, Col } from 'react-bootstrap';
-import { Users, Calendar, DollarSign, Activity, TrendingUp, Clock } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { StatsCard } from '../../common/Card';
-import { Card } from '../../common/Card';
-import DataTable from '../../common/DataTable';
-import { dashboardService, appointmentService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col } from "react-bootstrap";
+import {
+  Users,
+  Calendar,
+  DollarSign,
+  Activity,
+  TrendingUp,
+  Clock,
+} from "../../../lib/icons";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { StatsCard } from "../../common/Card";
+import { Card } from "../../common/Card";
+import DataTable from "../../common/DataTable";
+import {
+  dashboardService,
+  appointmentService,
+} from "../../../jsx-services/api";
 
 export const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -32,7 +42,7 @@ export const Dashboard = () => {
       setStats(statsData);
       setRecentAppointments(appointments.slice(0, 5));
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -40,31 +50,35 @@ export const Dashboard = () => {
 
   const appointmentColumns = [
     {
-      header: 'Token',
-      key: 'token_number',
-      minWidth: '100px',
+      header: "Token",
+      key: "token_number",
+      minWidth: "100px",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
-      minWidth: '180px',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
+      minWidth: "180px",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
-      minWidth: '180px',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
+      minWidth: "180px",
     },
     {
-      header: 'Time',
+      header: "Time",
       render: (row) => new Date(row.scheduled_at).toLocaleTimeString(),
-      minWidth: '120px',
+      minWidth: "120px",
     },
     {
-      header: 'Status',
-      key: 'status',
-      minWidth: '120px',
+      header: "Status",
+      key: "status",
+      minWidth: "120px",
     },
   ];
 
@@ -73,7 +87,9 @@ export const Dashboard = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Dashboard Overview</h2>
-          <p className="text-muted">Welcome back! Here's what's happening today.</p>
+          <p className="text-muted">
+            Welcome back! Here's what's happening today.
+          </p>
         </Col>
       </Row>
 
@@ -159,10 +175,10 @@ export const Dashboard = () => {
           <Card title="Recent Activities">
             <div className="d-flex flex-column gap-2">
               {[
-                'New patient registered',
-                'Lab report completed',
-                'Prescription dispensed',
-                'Payment received',
+                "New patient registered",
+                "Lab report completed",
+                "Prescription dispensed",
+                "Payment received",
               ].map((activity, index) => (
                 <div key={index} className="p-2 border-bottom">
                   <small className="text-muted">{activity}</small>

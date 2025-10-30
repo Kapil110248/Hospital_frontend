@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Form } from 'react-bootstrap';
-import { Activity, Users, Heart, Thermometer } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { StatsCard } from '../../common/Card';
-import { Card } from '../../common/Card';
-import DataTable from '../../common/DataTable';
-import Button from '../../common/Button';
-import Modal from '../../common/Modal';
-import { appointmentService, patientService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Form } from "react-bootstrap";
+import { Activity, Users, Heart, Thermometer } from "../../../lib/icons";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { StatsCard } from "../../common/Card";
+import { Card } from "../../common/Card";
+import DataTable from "../../common/DataTable";
+import Button from "../../common/Button";
+import Modal from "../../common/Modal";
+import { appointmentService, patientService } from "../../../jsx-services/api";
 
 export const NurseDashboard = () => {
   const navigate = useNavigate();
@@ -18,12 +18,12 @@ export const NurseDashboard = () => {
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [vitalsData, setVitalsData] = useState({
-    temperature: '',
-    bloodPressureSystolic: '',
-    bloodPressureDiastolic: '',
-    heartRate: '',
-    respiratoryRate: '',
-    oxygenSaturation: '',
+    temperature: "",
+    bloodPressureSystolic: "",
+    bloodPressureDiastolic: "",
+    heartRate: "",
+    respiratoryRate: "",
+    oxygenSaturation: "",
   });
 
   useEffect(() => {
@@ -39,9 +39,9 @@ export const NurseDashboard = () => {
       ]);
 
       setAppointments(appointmentData);
-      setIpdPatients(patientData.filter(p => p.status === 'IPD').slice(0, 5));
+      setIpdPatients(patientData.filter((p) => p.status === "IPD").slice(0, 5));
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -49,10 +49,10 @@ export const NurseDashboard = () => {
 
   const handleCheckIn = async (appointmentId) => {
     try {
-      await appointmentService.update(appointmentId, { status: 'CHECKED_IN' });
+      await appointmentService.update(appointmentId, { status: "CHECKED_IN" });
       loadDashboardData();
     } catch (error) {
-      console.error('Error checking in:', error);
+      console.error("Error checking in:", error);
     }
   };
 
@@ -63,54 +63,59 @@ export const NurseDashboard = () => {
 
   const handleSaveVitals = async () => {
     try {
-      console.log('Saving vitals for patient:', selectedPatient.id, vitalsData);
+      console.log("Saving vitals for patient:", selectedPatient.id, vitalsData);
       setShowVitalsModal(false);
       setVitalsData({
-        temperature: '',
-        bloodPressureSystolic: '',
-        bloodPressureDiastolic: '',
-        heartRate: '',
-        respiratoryRate: '',
-        oxygenSaturation: '',
+        temperature: "",
+        bloodPressureSystolic: "",
+        bloodPressureDiastolic: "",
+        heartRate: "",
+        respiratoryRate: "",
+        oxygenSaturation: "",
       });
     } catch (error) {
-      console.error('Error saving vitals:', error);
+      console.error("Error saving vitals:", error);
     }
   };
 
   const appointmentColumns = [
     {
-      header: 'Token',
-      key: 'token_number',
+      header: "Token",
+      key: "token_number",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Time',
-      render: (row) => new Date(row.scheduled_at).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+      header: "Time",
+      render: (row) =>
+        new Date(row.scheduled_at).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          SCHEDULED: 'secondary',
-          CHECKED_IN: 'info',
-          IN_CONSULTATION: 'warning',
-          COMPLETED: 'success',
+          SCHEDULED: "secondary",
+          CHECKED_IN: "info",
+          IN_CONSULTATION: "warning",
+          COMPLETED: "success",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
     {
-      header: 'Actions',
-      render: (row) => (
-        row.status === 'SCHEDULED' && (
+      header: "Actions",
+      render: (row) =>
+        row.status === "SCHEDULED" && (
           <Button
             size="sm"
             variant="primary"
@@ -118,26 +123,25 @@ export const NurseDashboard = () => {
           >
             Check In
           </Button>
-        )
-      ),
+        ),
     },
   ];
 
   const ipdColumns = [
     {
-      header: 'UPID',
-      key: 'upid',
+      header: "UPID",
+      key: "upid",
     },
     {
-      header: 'Name',
+      header: "Name",
       render: (row) => `${row.first_name} ${row.last_name}`,
     },
     {
-      header: 'Age',
-      key: 'age',
+      header: "Age",
+      key: "age",
     },
     {
-      header: 'Actions',
+      header: "Actions",
       render: (row) => (
         <Button
           size="sm"
@@ -180,7 +184,7 @@ export const NurseDashboard = () => {
         <Col md={6} xl={3}>
           <StatsCard
             title="Checked In"
-            value={appointments.filter(a => a.status === 'CHECKED_IN').length}
+            value={appointments.filter((a) => a.status === "CHECKED_IN").length}
             icon={Heart}
             bgColor="success"
           />
@@ -188,7 +192,7 @@ export const NurseDashboard = () => {
         <Col md={6} xl={3}>
           <StatsCard
             title="Pending Check-In"
-            value={appointments.filter(a => a.status === 'SCHEDULED').length}
+            value={appointments.filter((a) => a.status === "SCHEDULED").length}
             icon={Thermometer}
             bgColor="warning"
           />
@@ -213,21 +217,21 @@ export const NurseDashboard = () => {
             <div className="d-grid gap-2">
               <Button
                 variant="outline-primary"
-                onClick={() => navigate('/patients')}
+                onClick={() => navigate("/patients")}
               >
                 <Heart size={18} className="me-2" />
                 Record Vitals
               </Button>
               <Button
                 variant="outline-success"
-                onClick={() => navigate('/prescriptions')}
+                onClick={() => navigate("/prescriptions")}
               >
                 <Activity size={18} className="me-2" />
                 Medication Round
               </Button>
               <Button
                 variant="outline-info"
-                onClick={() => navigate('/patients')}
+                onClick={() => navigate("/patients")}
               >
                 <Users size={18} className="me-2" />
                 Patient Handover
@@ -267,7 +271,10 @@ export const NurseDashboard = () => {
                   step="0.1"
                   value={vitalsData.temperature}
                   onChange={(e) =>
-                    setVitalsData({ ...vitalsData, temperature: e.target.value })
+                    setVitalsData({
+                      ...vitalsData,
+                      temperature: e.target.value,
+                    })
                   }
                 />
               </Form.Group>
@@ -280,7 +287,10 @@ export const NurseDashboard = () => {
                   type="number"
                   value={vitalsData.bloodPressureSystolic}
                   onChange={(e) =>
-                    setVitalsData({ ...vitalsData, bloodPressureSystolic: e.target.value })
+                    setVitalsData({
+                      ...vitalsData,
+                      bloodPressureSystolic: e.target.value,
+                    })
                   }
                 />
               </Form.Group>
@@ -293,7 +303,10 @@ export const NurseDashboard = () => {
                   type="number"
                   value={vitalsData.bloodPressureDiastolic}
                   onChange={(e) =>
-                    setVitalsData({ ...vitalsData, bloodPressureDiastolic: e.target.value })
+                    setVitalsData({
+                      ...vitalsData,
+                      bloodPressureDiastolic: e.target.value,
+                    })
                   }
                 />
               </Form.Group>
@@ -319,7 +332,10 @@ export const NurseDashboard = () => {
                   type="number"
                   value={vitalsData.respiratoryRate}
                   onChange={(e) =>
-                    setVitalsData({ ...vitalsData, respiratoryRate: e.target.value })
+                    setVitalsData({
+                      ...vitalsData,
+                      respiratoryRate: e.target.value,
+                    })
                   }
                 />
               </Form.Group>
@@ -333,7 +349,10 @@ export const NurseDashboard = () => {
                   step="0.1"
                   value={vitalsData.oxygenSaturation}
                   onChange={(e) =>
-                    setVitalsData({ ...vitalsData, oxygenSaturation: e.target.value })
+                    setVitalsData({
+                      ...vitalsData,
+                      oxygenSaturation: e.target.value,
+                    })
                   }
                 />
               </Form.Group>
@@ -341,7 +360,10 @@ export const NurseDashboard = () => {
           </Row>
 
           <div className="d-flex gap-2 justify-content-end">
-            <Button variant="secondary" onClick={() => setShowVitalsModal(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowVitalsModal(false)}
+            >
               Cancel
             </Button>
             <Button variant="primary" onClick={handleSaveVitals}>

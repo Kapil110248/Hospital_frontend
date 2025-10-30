@@ -1,16 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge, Alert } from 'react-bootstrap';
-import { Users, Calendar, DollarSign, Activity, UserPlus, FileText, UserCog } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { StatsCard } from '../../common/Card';
-import { Card } from '../../common/Card';
-import DataTable from '../../common/DataTable';
-import Button from '../../common/Button';
-import Modal from '../../common/Modal';
-import PatientRegistrationForm from '../../forms/PatientRegistrationForm';
-import StaffRegistrationForm from '../../forms/StaffRegistrationForm';
-import { dashboardService, patientService, appointmentService, staffService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge, Alert } from "react-bootstrap";
+import {
+  Users,
+  Calendar,
+  DollarSign,
+  Activity,
+  UserPlus,
+  FileText,
+  UserCog,
+} from "../../../lib/icons";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { StatsCard } from "../../common/Card";
+import { Card } from "../../common/Card";
+import DataTable from "../../common/DataTable";
+import Button from "../../common/Button";
+import Modal from "../../common/Modal";
+import PatientRegistrationForm from "../../forms/PatientRegistrationForm";
+import StaffRegistrationForm from "../../forms/StaffRegistrationForm";
+import {
+  dashboardService,
+  patientService,
+  appointmentService,
+  staffService,
+} from "../../../jsx-services/api";
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -24,7 +37,7 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showPatientModal, setShowPatientModal] = useState(false);
   const [showStaffModal, setShowStaffModal] = useState(false);
-  const [success, setSuccess] = useState('');
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -43,7 +56,7 @@ export const AdminDashboard = () => {
       setRecentPatients(patients.slice(0, 5));
       setRecentAppointments(appointments.slice(0, 5));
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -51,53 +64,55 @@ export const AdminDashboard = () => {
 
   const handlePatientSuccess = () => {
     setShowPatientModal(false);
-    setSuccess('Patient registered successfully!');
+    setSuccess("Patient registered successfully!");
     loadDashboardData();
-    setTimeout(() => setSuccess(''), 3000);
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleStaffSuccess = () => {
     setShowStaffModal(false);
-    setSuccess('Staff member registered successfully!');
+    setSuccess("Staff member registered successfully!");
     loadDashboardData();
-    setTimeout(() => setSuccess(''), 3000);
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const patientColumns = [
     {
-      header: 'UPID',
-      key: 'upid',
+      header: "UPID",
+      key: "upid",
     },
     {
-      header: 'Name',
+      header: "Name",
       render: (row) => `${row.first_name} ${row.last_name}`,
     },
     {
-      header: 'Phone',
-      key: 'phone',
+      header: "Phone",
+      key: "phone",
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => <Badge bg="primary">{row.status}</Badge>,
     },
   ];
 
   const appointmentColumns = [
     {
-      header: 'Token',
-      key: 'token_number',
+      header: "Token",
+      key: "token_number",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Time',
+      header: "Time",
       render: (row) => new Date(row.scheduled_at).toLocaleTimeString(),
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => <Badge bg="info">{row.status}</Badge>,
     },
   ];
@@ -107,7 +122,9 @@ export const AdminDashboard = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Admin Overview</h2>
-          <p className="text-muted">Complete hospital management at your fingertips</p>
+          <p className="text-muted">
+            Complete hospital management at your fingertips
+          </p>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowPatientModal(true)}>
@@ -157,7 +174,12 @@ export const AdminDashboard = () => {
       </Row>
 
       {success && (
-        <Alert variant="success" dismissible onClose={() => setSuccess('')} className="mb-4">
+        <Alert
+          variant="success"
+          dismissible
+          onClose={() => setSuccess("")}
+          className="mb-4"
+        >
           {success}
         </Alert>
       )}
@@ -177,7 +199,7 @@ export const AdminDashboard = () => {
               <Button
                 variant="outline-success"
                 className="text-start"
-                onClick={() => navigate('/appointments')}
+                onClick={() => navigate("/appointments")}
               >
                 <Calendar size={18} className="me-2" />
                 Book Appointment
@@ -185,7 +207,7 @@ export const AdminDashboard = () => {
               <Button
                 variant="outline-info"
                 className="text-start"
-                onClick={() => navigate('/reports')}
+                onClick={() => navigate("/reports")}
               >
                 <FileText size={18} className="me-2" />
                 View Reports

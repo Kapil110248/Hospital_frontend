@@ -1,28 +1,28 @@
-import { useState } from 'react';
-import { Container, Row, Col, Form, Alert } from 'react-bootstrap';
-import { Activity } from 'lucide-react';
-import { useAuth } from '../../jsx-context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import Button from '../common/Button';
+import { useState } from "react";
+import { Container, Row, Col, Form, Alert } from "react-bootstrap";
+import { Activity } from "../../lib/icons";
+import { useAuth } from "../../jsx-context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import Button from "../common/Button";
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await signIn(email, password);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.message || 'Failed to sign in');
+      setError(err.message || "Failed to sign in");
     } finally {
       setLoading(false);
     }
@@ -34,8 +34,10 @@ export const Login = () => {
         <Row className="justify-content-center">
           <Col md={5} lg={4}>
             <div className="text-center mb-4">
-              <div className="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3"
-                   style={{ width: '80px', height: '80px' }}>
+              <div
+                className="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3"
+                style={{ width: "80px", height: "80px" }}
+              >
                 <Activity size={40} />
               </div>
               <h2 className="fw-bold text-primary">Hospital Management</h2>
@@ -45,7 +47,11 @@ export const Login = () => {
             <div className="card shadow-lg border-0">
               <div className="card-body p-4">
                 {error && (
-                  <Alert variant="danger" dismissible onClose={() => setError('')}>
+                  <Alert
+                    variant="danger"
+                    dismissible
+                    onClose={() => setError("")}
+                  >
                     {error}
                   </Alert>
                 )}

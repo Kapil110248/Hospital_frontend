@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Badge } from 'react-bootstrap';
-import { Calendar, UserPlus, Users, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import { StatsCard } from '../../common/Card';
-import { Card } from '../../common/Card';
-import DataTable from '../../common/DataTable';
-import Button from '../../common/Button';
-import Modal from '../../common/Modal';
-import PatientRegistrationForm from '../../forms/PatientRegistrationForm';
-import { appointmentService, patientService } from '../../../jsx-services/api';
+import { useState, useEffect } from "react";
+import { Row, Col, Badge } from "react-bootstrap";
+import { Calendar, UserPlus, Users, Clock } from "../../../lib/icons";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import { StatsCard } from "../../common/Card";
+import { Card } from "../../common/Card";
+import DataTable from "../../common/DataTable";
+import Button from "../../common/Button";
+import Modal from "../../common/Modal";
+import PatientRegistrationForm from "../../forms/PatientRegistrationForm";
+import { appointmentService, patientService } from "../../../jsx-services/api";
 
 export const ReceptionistDashboard = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export const ReceptionistDashboard = () => {
       setAppointments(appointmentData);
       setPatients(patientData.slice(0, 10));
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -47,56 +47,63 @@ export const ReceptionistDashboard = () => {
 
   const appointmentColumns = [
     {
-      header: 'Token',
-      key: 'token_number',
+      header: "Token",
+      key: "token_number",
     },
     {
-      header: 'Patient',
+      header: "Patient",
       render: (row) =>
-        row.patient ? `${row.patient.first_name} ${row.patient.last_name}` : 'N/A',
+        row.patient
+          ? `${row.patient.first_name} ${row.patient.last_name}`
+          : "N/A",
     },
     {
-      header: 'Doctor',
+      header: "Doctor",
       render: (row) =>
-        row.doctor ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}` : 'N/A',
+        row.doctor
+          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
+          : "N/A",
     },
     {
-      header: 'Time',
-      render: (row) => new Date(row.scheduled_at).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+      header: "Time",
+      render: (row) =>
+        new Date(row.scheduled_at).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => {
         const variants = {
-          SCHEDULED: 'secondary',
-          CHECKED_IN: 'info',
-          IN_CONSULTATION: 'warning',
-          COMPLETED: 'success',
-          CANCELLED: 'danger',
+          SCHEDULED: "secondary",
+          CHECKED_IN: "info",
+          IN_CONSULTATION: "warning",
+          COMPLETED: "success",
+          CANCELLED: "danger",
         };
-        return <Badge bg={variants[row.status] || 'secondary'}>{row.status}</Badge>;
+        return (
+          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
+        );
       },
     },
   ];
 
   const patientColumns = [
     {
-      header: 'UPID',
-      key: 'upid',
+      header: "UPID",
+      key: "upid",
     },
     {
-      header: 'Name',
+      header: "Name",
       render: (row) => `${row.first_name} ${row.last_name}`,
     },
     {
-      header: 'Phone',
-      key: 'phone',
+      header: "Phone",
+      key: "phone",
     },
     {
-      header: 'Status',
+      header: "Status",
       render: (row) => <Badge bg="primary">{row.status}</Badge>,
     },
   ];
@@ -106,14 +113,19 @@ export const ReceptionistDashboard = () => {
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold">Reception Desk</h2>
-          <p className="text-muted">Manage patient registrations and appointments</p>
+          <p className="text-muted">
+            Manage patient registrations and appointments
+          </p>
         </Col>
         <Col xs="auto" className="d-flex gap-2">
           <Button variant="primary" onClick={() => setShowPatientModal(true)}>
             <UserPlus size={18} className="me-2" />
             Register Patient
           </Button>
-          <Button variant="success" onClick={() => setShowAppointmentModal(true)}>
+          <Button
+            variant="success"
+            onClick={() => setShowAppointmentModal(true)}
+          >
             <Calendar size={18} className="me-2" />
             Book Appointment
           </Button>
@@ -140,7 +152,7 @@ export const ReceptionistDashboard = () => {
         <Col md={6} xl={3}>
           <StatsCard
             title="Waiting"
-            value={appointments.filter(a => a.status === 'CHECKED_IN').length}
+            value={appointments.filter((a) => a.status === "CHECKED_IN").length}
             icon={Clock}
             bgColor="warning"
           />
@@ -148,7 +160,7 @@ export const ReceptionistDashboard = () => {
         <Col md={6} xl={3}>
           <StatsCard
             title="Completed"
-            value={appointments.filter(a => a.status === 'COMPLETED').length}
+            value={appointments.filter((a) => a.status === "COMPLETED").length}
             icon={Calendar}
             bgColor="success"
           />
@@ -171,15 +183,24 @@ export const ReceptionistDashboard = () => {
         <Col lg={4}>
           <Card title="Quick Actions">
             <div className="d-grid gap-2">
-              <Button variant="outline-primary" onClick={() => setShowPatientModal(true)}>
+              <Button
+                variant="outline-primary"
+                onClick={() => setShowPatientModal(true)}
+              >
                 <UserPlus size={18} className="me-2" />
                 Register New Patient
               </Button>
-              <Button variant="outline-success" onClick={() => setShowAppointmentModal(true)}>
+              <Button
+                variant="outline-success"
+                onClick={() => setShowAppointmentModal(true)}
+              >
                 <Calendar size={18} className="me-2" />
                 Book Appointment
               </Button>
-              <Button variant="outline-info" onClick={() => navigate('/patients')}>
+              <Button
+                variant="outline-info"
+                onClick={() => navigate("/patients")}
+              >
                 <Users size={18} className="me-2" />
                 Search Patient
               </Button>
@@ -190,15 +211,24 @@ export const ReceptionistDashboard = () => {
             <div className="d-flex flex-column gap-2">
               <div className="d-flex justify-content-between p-2 bg-light rounded">
                 <span>Waiting</span>
-                <Badge bg="warning">{appointments.filter(a => a.status === 'CHECKED_IN').length}</Badge>
+                <Badge bg="warning">
+                  {appointments.filter((a) => a.status === "CHECKED_IN").length}
+                </Badge>
               </div>
               <div className="d-flex justify-content-between p-2 bg-light rounded">
                 <span>In Consultation</span>
-                <Badge bg="info">{appointments.filter(a => a.status === 'IN_CONSULTATION').length}</Badge>
+                <Badge bg="info">
+                  {
+                    appointments.filter((a) => a.status === "IN_CONSULTATION")
+                      .length
+                  }
+                </Badge>
               </div>
               <div className="d-flex justify-content-between p-2 bg-light rounded">
                 <span>Completed</span>
-                <Badge bg="success">{appointments.filter(a => a.status === 'COMPLETED').length}</Badge>
+                <Badge bg="success">
+                  {appointments.filter((a) => a.status === "COMPLETED").length}
+                </Badge>
               </div>
             </div>
           </Card>

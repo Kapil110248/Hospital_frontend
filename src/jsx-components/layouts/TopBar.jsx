@@ -1,7 +1,7 @@
-import { Navbar, Container, Form, Badge } from 'react-bootstrap';
-import { Bell, Search } from 'lucide-react';
+import { Navbar, Container, Form, Badge } from "react-bootstrap";
+import { Bell, Search } from "../../lib/icons";
 
-export const TopBar = ({ title = 'Dashboard' }) => {
+export const TopBar = ({ title = "Dashboard" }) => {
   return (
     <Navbar bg="white" className="border-bottom shadow-sm py-3">
       <Container fluid>
@@ -17,7 +17,7 @@ export const TopBar = ({ title = 'Dashboard' }) => {
                 type="search"
                 placeholder="Search patients, appointments..."
                 className="border-start-0"
-                style={{ minWidth: '300px' }}
+                style={{ minWidth: "300px" }}
               />
             </div>
           </Form>
@@ -29,7 +29,7 @@ export const TopBar = ({ title = 'Dashboard' }) => {
                 bg="danger"
                 pill
                 className="position-absolute top-0 start-100 translate-middle"
-                style={{ fontSize: '0.65rem' }}
+                style={{ fontSize: "0.65rem" }}
               >
                 3
               </Badge>
