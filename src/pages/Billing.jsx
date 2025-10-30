@@ -1,12 +1,12 @@
+
 import { useState } from "react";
-import { DollarSign, Search, Plus, Download } from "../lib/icons";
+import { Plus } from "../lib/icons";
 import { Button } from "../components/common/Button";
-import { DataTable } from "../components/common/DataTable";
 
 export function Billing() {
   const [searchQuery, setSearchQuery] = useState("");
-
-  const invoices = [
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [invoices, setInvoices] = useState([
     {
       id: "1",
       invoiceNo: "INV-001",
@@ -29,29 +29,17 @@ export function Billing() {
       date: "2024-10-28",
       status: "PARTIAL",
     },
-    {
-      id: "3",
-      invoiceNo: "INV-003",
-      patientName: "Bob Johnson",
-      services: "Surgery, Medications",
-      amount: 8750.0,
-      paid: 0,
-      balance: 8750.0,
-      date: "2024-10-27",
-      status: "PENDING",
-    },
-    {
-      id: "4",
-      invoiceNo: "INV-004",
-      patientName: "Alice Williams",
-      services: "Vaccination, Consultation",
-      amount: 450.0,
-      paid: 450.0,
-      balance: 0,
-      date: "2024-10-27",
-      status: "PAID",
-    },
-  ];
+  ]);
+
+  const [newInvoice, setNewInvoice] = useState({
+    invoiceNo: "",
+    patientName: "",
+    services: "",
+    amount: "",
+    paid: "",
+    date: "",
+    status: "PENDING",
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -61,15 +49,39 @@ export function Billing() {
         return "bg-yellow-100 text-yellow-700";
       case "PENDING":
         return "bg-red-100 text-red-700";
-      case "OVERDUE":
-        return "bg-red-200 text-red-800";
       default:
         return "bg-gray-100 text-gray-700";
     }
   };
 
+  const handleCreateInvoice = (e) => {
+    e.preventDefault();
+
+    const balance =
+      parseFloat(newInvoice.amount || 0) - parseFloat(newInvoice.paid || 0);
+
+    const newEntry = {
+      id: Date.now().toString(),
+      ...newInvoice,
+      balance,
+    };
+
+    setInvoices([...invoices, newEntry]); // ✅ Add to table
+    setNewInvoice({
+      invoiceNo: "",
+      patientName: "",
+      services: "",
+      amount: "",
+      paid: "",
+      date: "",
+      status: "PENDING",
+    });
+    setIsModalOpen(false); // Close modal
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display font-bold text-gray-900">
@@ -79,157 +91,146 @@ export function Billing() {
             Manage invoices and payment records
           </p>
         </div>
-        <Button icon={Plus}>Create Invoice</Button>
+        <Button icon={Plus} onClick={() => setIsModalOpen(true)}>
+          Create Invoice
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: "Today's Revenue", value: "$12,450", color: "green" },
-          { label: "Pending Payments", value: "$28,500", color: "yellow" },
-          { label: "Total Invoices", value: "142", color: "blue" },
-          { label: "Collection Rate", value: "87%", color: "purple" },
-        ].map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {stat.value}
-                </p>
-              </div>
-              <div className={`p-3 bg-${stat.color}-100 rounded-lg`}>
-                <DollarSign className={`w-6 h-6 text-${stat.color}-600`} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* ✅ Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg w-[420px] p-6 relative">
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+              onClick={() => setIsModalOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4">Create New Invoice</h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Payment Methods
-          </h2>
-          <div className="space-y-3">
-            {[
-              { method: "Cash", amount: "$4,200", percentage: "34%" },
-              { method: "Credit Card", amount: "$5,800", percentage: "47%" },
-              { method: "Insurance", amount: "$2,450", percentage: "19%" },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            <form className="space-y-3" onSubmit={handleCreateInvoice}>
+              <input
+                type="text"
+                placeholder="Invoice Number"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.invoiceNo}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, invoiceNo: e.target.value })
+                }
+                required
+              />
+              <input
+                type="text"
+                placeholder="Patient Name"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.patientName}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, patientName: e.target.value })
+                }
+                required
+              />
+              <input
+                type="text"
+                placeholder="Services"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.services}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, services: e.target.value })
+                }
+                required
+              />
+              <input
+                type="number"
+                placeholder="Amount"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.amount}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, amount: e.target.value })
+                }
+                required
+              />
+              <input
+                type="number"
+                placeholder="Paid"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.paid}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, paid: e.target.value })
+                }
+              />
+              <input
+                type="date"
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.date}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, date: e.target.value })
+                }
+                required
+              />
+              <select
+                className="w-full border rounded-lg p-2"
+                value={newInvoice.status}
+                onChange={(e) =>
+                  setNewInvoice({ ...newInvoice, status: e.target.value })
+                }
               >
-                <div>
-                  <p className="font-medium text-gray-900">{item.method}</p>
-                  <p className="text-sm text-gray-600">
-                    {item.percentage} of total
-                  </p>
-                </div>
-                <span className="font-bold text-gray-900">{item.amount}</span>
-              </div>
+                <option value="PENDING">Pending</option>
+                <option value="PARTIAL">Partial</option>
+                <option value="PAID">Paid</option>
+              </select>
+
+              <Button type="submit">Add Invoice</Button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Table */}
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3">Invoice No</th>
+              <th className="p-3">Patient</th>
+              <th className="p-3">Services</th>
+              <th className="p-3">Amount</th>
+              <th className="p-3">Paid</th>
+              <th className="p-3">Balance</th>
+              <th className="p-3">Date</th>
+              <th className="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map((inv) => (
+              <tr key={inv.id} className="border-t hover:bg-gray-50">
+                <td className="p-3">{inv.invoiceNo}</td>
+                <td className="p-3">{inv.patientName}</td>
+                <td className="p-3">{inv.services}</td>
+                <td className="p-3">₹{inv.amount}</td>
+                <td className="p-3">₹{inv.paid}</td>
+                <td className="p-3">₹{inv.balance}</td>
+                <td className="p-3">{inv.date}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-1 rounded text-sm font-semibold ${getStatusColor(
+                      inv.status
+                    )}`}
+                  >
+                    {inv.status}
+                  </span>
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
-
-        <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Top Services</h2>
-          <div className="space-y-3">
-            {[
-              { service: "Consultations", revenue: "$3,500" },
-              { service: "Lab Tests", revenue: "$2,800" },
-              { service: "Imaging Studies", revenue: "$4,150" },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <span className="font-medium text-gray-900">
-                  {item.service}
-                </span>
-                <span className="font-bold text-gray-900">{item.revenue}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search invoices by number or patient name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        <DataTable
-          data={invoices}
-          columns={[
-            { header: "Invoice #", accessor: "invoiceNo" },
-            { header: "Patient", accessor: "patientName" },
-            { header: "Services", accessor: "services" },
-            {
-              header: "Amount",
-              accessor: (row) => `$${row.amount.toFixed(2)}`,
-            },
-            {
-              header: "Paid",
-              accessor: (row) => `$${row.paid.toFixed(2)}`,
-            },
-            {
-              header: "Balance",
-              accessor: (row) => (
-                <span
-                  className={
-                    row.balance > 0
-                      ? "text-red-600 font-medium"
-                      : "text-green-600"
-                  }
-                >
-                  ${row.balance.toFixed(2)}
-                </span>
-              ),
-            },
-            { header: "Date", accessor: "date" },
-            {
-              header: "Status",
-              accessor: (row) => (
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    row.status
-                  )}`}
-                >
-                  {row.status}
-                </span>
-              ),
-            },
-            {
-              header: "Actions",
-              accessor: (row) => (
-                <div className="flex items-center gap-2">
-                  <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Download className="w-4 h-4" />
-                  </button>
-                  {row.status !== "PAID" && (
-                    <button className="px-3 py-1 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                      Record Payment
-                    </button>
-                  )}
-                </div>
-              ),
-            },
-          ]}
-        />
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
+
+
+
+
+
+   
+
