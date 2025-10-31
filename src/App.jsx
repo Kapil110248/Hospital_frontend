@@ -4,69 +4,35 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { lazyImport } from "./utils/lazyImport";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
-const Login = lazyImport(() => import("./pages/Login"), "Login");
-const DashboardLayout = lazyImport(
-  () => import("./components/layouts/DashboardLayout"),
-  "DashboardLayout"
-);
+// ✅ Login + Layout
+const Login = lazyImport(() => import("./pages/Login"));
+const DashboardLayout = lazyImport(() => import("./components/layouts/DashboardLayout"));
 
-const AdminDashboard = lazyImport(
-  () => import("./pages/dashboard/AdminDashboard"),
-  "AdminDashboard"
-);
-const DoctorDashboard = lazyImport(
-  () => import("./pages/dashboard/DoctorDashboard"),
-  "DoctorDashboard"
-);
-const NurseDashboard = lazyImport(
-  () => import("./pages/dashboard/NurseDashboard"),
-  "NurseDashboard"
-);
-const ReceptionistDashboard = lazyImport(() =>
-  import("./pages/dashboard/ReceptionistDashboard")
-);
-const PharmacistDashboard = lazyImport(
-  () => import("./pages/dashboard/PharmacistDashboard"),
-  "PharmacistDashboard"
-);
-const LabTechDashboard = lazyImport(
-  () => import("./pages/dashboard/LabTechDashboard"),
-  "LabTechDashboard"
-);
-const RadiologistDashboard = lazyImport(
-  () => import("./pages/dashboard/RadiologistDashboard"),
-  "RadiologistDashboard"
-);
-const FinanceDashboard = lazyImport(
-  () => import("./pages/dashboard/FinanceDashboard"),
-  "FinanceDashboard"
-);
-const HRDashboard = lazyImport(
-  () => import("./pages/dashboard/HRDashboard"),
-  "HRDashboard"
-);
-const PatientPortal = lazyImport(
-  () => import("./pages/dashboard/PatientPortal"),
-  "PatientPortal"
-);
-const AuditorDashboard = lazyImport(
-  () => import("./pages/dashboard/AuditorDashboard"),
-  "AuditorDashboard"
-);
+// ✅ Dashboards (All default exports — so no second argument!)
+const AdminDashboard = lazyImport(() => import("./pages/dashboard/AdminDashboard"));
+const DoctorDashboard = lazyImport(() => import("./pages/dashboard/DoctorDashboard"));
+const NurseDashboard = lazyImport(() => import("./pages/dashboard/NurseDashboard"));
+const ReceptionistDashboard = lazyImport(() => import("./pages/dashboard/ReceptionistDashboard"));
+const PharmacistDashboard = lazyImport(() => import("./pages/dashboard/PharmacistDashboard"));
+const LabTechDashboard = lazyImport(() => import("./pages/dashboard/LabTechDashboard"));
+const RadiologistDashboard = lazyImport(() => import("./pages/dashboard/RadiologistDashboard"));
+const FinanceDashboard = lazyImport(() => import("./pages/dashboard/FinanceDashboard"));
+const HRDashboard = lazyImport(() => import("./pages/dashboard/HRDashboard"));
+const PatientPortal = lazyImport(() => import("./pages/dashboard/PatientPortal"));
+const AuditorDashboard = lazyImport(() => import("./pages/dashboard/AuditorDashboard"));
 
-const Patients = lazyImport(() => import("./pages/Patients"), "Patients");
+// ✅ Other Pages
+const Patients = lazyImport(() => import("./pages/Patients"));
 const Appointments = lazyImport(() => import("./pages/Appointments"));
-const Prescriptions = lazyImport(
-  () => import("./pages/Prescriptions"),
-  "Prescriptions"
-);
-const Pharmacy = lazyImport(() => import("./pages/Pharmacy"), "Pharmacy");
-const Laboratory = lazyImport(() => import("./pages/Laboratory"), "Laboratory");
-const Radiology = lazyImport(() => import("./pages/Radiology"), "Radiology");
-const Billing = lazyImport(() => import("./pages/Billing"), "Billing");
-const Staff = lazyImport(() => import("./pages/Staff"), "Staff");
-const Reports = lazyImport(() => import("./pages/Reports"), "Reports");
+const Prescriptions = lazyImport(() => import("./pages/Prescriptions"));
+const Pharmacy = lazyImport(() => import("./pages/Pharmacy"));
+const Laboratory = lazyImport(() => import("./pages/Laboratory"));
+const Radiology = lazyImport(() => import("./pages/Radiology"));
+const Billing = lazyImport(() => import("./pages/Billing"));
+const Staff = lazyImport(() => import("./pages/Staff"));
+const Reports = lazyImport(() => import("./pages/Reports"));
 
+// ✅ Loader
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-hospital-purple/20 via-white to-teal-500/20 flex items-center justify-center">
@@ -78,26 +44,21 @@ function LoadingFallback() {
   );
 }
 
+// ✅ Protected Route
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <LoadingFallback />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  if (loading) return <LoadingFallback />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return <Suspense fallback={<LoadingFallback />}>{children}</Suspense>;
 }
 
+// ✅ Dashboard Router (Dynamic Role-based Loading)
 function DashboardRouter() {
   const { user } = useAuth();
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!user) return <Navigate to="/login" replace />;
 
   const dashboardMap = {
     ADMIN: AdminDashboard,
@@ -118,9 +79,7 @@ function DashboardRouter() {
   if (!Component) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome to HMS
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to HMS</h2>
         <p className="text-gray-600">
           Dashboard for {user.role} is under development
         </p>
@@ -135,12 +94,14 @@ function DashboardRouter() {
   );
 }
 
+// ✅ Main App
 function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            {/* Login */}
             <Route
               path="/login"
               element={
@@ -151,6 +112,8 @@ function App() {
                 </Suspense>
               }
             />
+
+            {/* Protected Dashboard */}
             <Route
               path="/dashboard/*"
               element={
@@ -173,6 +136,8 @@ function App() {
                   </Suspense>
                 }
               />
+
+              {/* Nested routes */}
               <Route
                 path="patients"
                 element={
@@ -264,6 +229,8 @@ function App() {
                 }
               />
             </Route>
+
+            {/* Default Redirects */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

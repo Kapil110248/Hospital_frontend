@@ -1,279 +1,359 @@
-import { useState, useEffect } from "react";
-import { Row, Col, Badge } from "react-bootstrap";
-import { Calendar, UserPlus, Users, Clock } from "../../../lib/icons";
-import { useNavigate } from "react-router-dom";
-import DashboardLayout from "../../layouts/DashboardLayout";
-import { StatsCard } from "../../common/Card";
-import { Card } from "../../common/Card";
-import DataTable from "../../common/DataTable";
-import Button from "../../common/Button";
-import Modal from "../../common/Modal";
-import PatientRegistrationForm from "../../forms/PatientRegistrationForm";
-import { appointmentService, patientService } from "../../../jsx-services/api";
+// import React, { useState } from "react";
+// import {
+//   UserPlus,
+//   Calendar,
+//   DollarSign,
+//   Users,
+//   Search,
+//   Clock,
+// } from "../../lib/icons";
+// import { StatsCard } from "../../components/common/StatsCard";
+// import { Button } from "../../components/common/Button";
 
-export const ReceptionistDashboard = () => {
-  const navigate = useNavigate();
-  const [appointments, setAppointments] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showPatientModal, setShowPatientModal] = useState(false);
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+// export default function ReceptionistDashboard() {
+//   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+//   return (
+//     <div className="space-y-6">
+//       {/* Header Section */}
+//       <div className="flex items-center justify-between">
+//         <div>
+//           <h1 className="text-3xl font-display font-bold text-gray-900">
+//             Reception Dashboard
+//           </h1>
+//           <p className="text-gray-600 mt-1">
+//             Manage patient registration and appointments
+//           </p>
+//         </div>
+//         <div className="flex gap-3">
+//           <Button variant="outline" icon={Calendar}>
+//             Schedule Appointment
+//           </Button>
+//           <Button variant="primary" icon={UserPlus}>
+//             Register Patient
+//           </Button>
+//         </div>
+//       </div>
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      const [appointmentData, patientData] = await Promise.all([
-        appointmentService.getTodayAppointments(),
-        patientService.getAll(),
-      ]);
+//       {/* Stats Cards */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+//         <StatsCard
+//           title="Today's Appointments"
+//           value="48"
+//           icon={Calendar}
+//           color="purple"
+//         />
+//         <StatsCard title="Checked In" value="32" icon={Users} color="teal" />
+//         <StatsCard title="Waiting" value="8" icon={Clock} color="orange" />
+//         <StatsCard
+//           title="Collections"
+//           value="$8,340"
+//           icon={DollarSign}
+//           color="green"
+//         />
+//       </div>
 
-      setAppointments(appointmentData);
-      setPatients(patientData.slice(0, 10));
-    } catch (error) {
-      console.error("Error loading dashboard:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+//       {/* Patient Search */}
+//       <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+//         <h2 className="text-xl font-bold text-gray-900 mb-4">Patient Search</h2>
+//         <div className="relative max-w-2xl">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+//           <input
+//             type="text"
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             placeholder="Search by name, phone, or patient ID..."
+//             className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-hospital-purple focus:border-transparent"
+//           />
+//         </div>
+//       </div>
 
-  const handlePatientSuccess = () => {
-    setShowPatientModal(false);
-    loadDashboardData();
-  };
+//       {/* Appointment Queue and Pending Payments */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//         {/* Appointment Queue */}
+//         <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+//           <h2 className="text-xl font-bold text-gray-900 mb-4">
+//             Appointment Queue
+//           </h2>
+//           <div className="space-y-3">
+//             {[1, 2, 3, 4, 5].map((i) => (
+//               <div
+//                 key={i}
+//                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+//               >
+//                 <div className="flex items-center gap-4">
+//                   <div className="w-10 h-10 bg-hospital-purple rounded-lg flex items-center justify-center text-white font-bold">
+//                     {i}
+//                   </div>
+//                   <div>
+//                     <p className="font-medium text-gray-900">John Doe</p>
+//                     <p className="text-sm text-gray-600">
+//                       Dr. Smith • 10:00 AM
+//                     </p>
+//                   </div>
+//                 </div>
+//                 <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+//                   Waiting
+//                 </span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
 
-  const appointmentColumns = [
-    {
-      header: "Token",
-      key: "token_number",
-    },
-    {
-      header: "Patient",
-      render: (row) =>
-        row.patient
-          ? `${row.patient.first_name} ${row.patient.last_name}`
-          : "N/A",
-    },
-    {
-      header: "Doctor",
-      render: (row) =>
-        row.doctor
-          ? `Dr. ${row.doctor.first_name} ${row.doctor.last_name}`
-          : "N/A",
-    },
-    {
-      header: "Time",
-      render: (row) =>
-        new Date(row.scheduled_at).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-    },
-    {
-      header: "Status",
-      render: (row) => {
-        const variants = {
-          SCHEDULED: "secondary",
-          CHECKED_IN: "info",
-          IN_CONSULTATION: "warning",
-          COMPLETED: "success",
-          CANCELLED: "danger",
-        };
-        return (
-          <Badge bg={variants[row.status] || "secondary"}>{row.status}</Badge>
-        );
-      },
-    },
-  ];
+//         {/* Pending Payments */}
+//         <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+//           <h2 className="text-xl font-bold text-gray-900 mb-4">
+//             Pending Payments
+//           </h2>
+//           <div className="space-y-3">
+//             {[1, 2, 3].map((i) => (
+//               <div
+//                 key={i}
+//                 className="p-4 bg-warning-50 border border-warning-200 rounded-lg"
+//               >
+//                 <div className="flex items-center justify-between mb-2">
+//                   <p className="font-medium text-gray-900">
+//                     Patient #{1000 + i}
+//                   </p>
+//                   <span className="font-bold text-warning-600">
+//                     ${(Math.random() * 500 + 100).toFixed(2)}
+//                   </span>
+//                 </div>
+//                 <div className="flex gap-2">
+//                   <Button size="sm" variant="primary" className="flex-1">
+//                     Collect Payment
+//                   </Button>
+//                   <Button size="sm" variant="outline" className="flex-1">
+//                     View Invoice
+//                   </Button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
 
-  const patientColumns = [
-    {
-      header: "UPID",
-      key: "upid",
-    },
-    {
-      header: "Name",
-      render: (row) => `${row.first_name} ${row.last_name}`,
-    },
-    {
-      header: "Phone",
-      key: "phone",
-    },
-    {
-      header: "Status",
-      render: (row) => <Badge bg="primary">{row.status}</Badge>,
-    },
-  ];
+//       {/* Doctor Availability */}
+//       <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+//         <h2 className="text-xl font-bold text-gray-900 mb-4">
+//           Doctor Availability
+//         </h2>
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//           {["Dr. Smith", "Dr. Johnson", "Dr. Williams"].map((doctor, i) => (
+//             <div
+//               key={i}
+//               className="p-4 bg-success-50 border border-success-200 rounded-lg"
+//             >
+//               <div className="flex items-center gap-3">
+//                 <div className="w-12 h-12 bg-success-500 rounded-full flex items-center justify-center text-white font-bold">
+//                   {doctor.split(" ")[1][0]}
+//                 </div>
+//                 <div>
+//                   <p className="font-medium text-gray-900">{doctor}</p>
+//                   <p className="text-sm text-success-600">Available</p>
+//                 </div>
+//               </div>
+//               <div className="mt-3 text-sm text-gray-600">
+//                 <p>Next: 11:00 AM</p>
+//                 <p>Queue: 3 patients</p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+import React, { useState } from "react";
+import {
+  UserPlus,
+  Calendar,
+  DollarSign,
+  Users,
+  Search,
+  Clock,
+} from "../../lib/icons";
+import { StatsCard } from "../../components/common/StatsCard";
+import { Button } from "../../components/common/Button";
+import { PatientRegistrationForm } from "../../components/forms/PatientRegistrationForm";
+import { Modal } from "../../components/common/Modal";
+
+export default function ReceptionistDashboard() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleOpenRegister = () => setIsRegisterModalOpen(true);
+  const handleCloseRegister = () => setIsRegisterModalOpen(false);
 
   return (
-    <DashboardLayout title="Receptionist Dashboard">
-      <Row className="mb-4">
-        <Col>
-          <h2 className="fw-bold">Reception Desk</h2>
-          <p className="text-muted">
-            Manage patient registrations and appointments
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-display font-bold text-gray-900">
+            Reception Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Manage patient registration and appointments
           </p>
-        </Col>
-        <Col xs="auto" className="d-flex gap-2">
-          <Button variant="primary" onClick={() => setShowPatientModal(true)}>
-            <UserPlus size={18} className="me-2" />
-            Register Patient
+        </div>
+        <div className="flex gap-3">
+          <Button variant="outline" icon={Calendar}>
+            Schedule Appointment
           </Button>
           <Button
-            variant="success"
-            onClick={() => setShowAppointmentModal(true)}
+            variant="primary"
+            icon={UserPlus}
+            onClick={handleOpenRegister}
           >
-            <Calendar size={18} className="me-2" />
-            Book Appointment
+            Register Patient
           </Button>
-        </Col>
-      </Row>
-
-      <Row className="g-4 mb-4">
-        <Col md={6} xl={3}>
-          <StatsCard
-            title="Today's Appointments"
-            value={appointments.length}
-            icon={Calendar}
-            bgColor="primary"
-          />
-        </Col>
-        <Col md={6} xl={3}>
-          <StatsCard
-            title="Total Patients"
-            value={patients.length}
-            icon={Users}
-            bgColor="info"
-          />
-        </Col>
-        <Col md={6} xl={3}>
-          <StatsCard
-            title="Waiting"
-            value={appointments.filter((a) => a.status === "CHECKED_IN").length}
-            icon={Clock}
-            bgColor="warning"
-          />
-        </Col>
-        <Col md={6} xl={3}>
-          <StatsCard
-            title="Completed"
-            value={appointments.filter((a) => a.status === "COMPLETED").length}
-            icon={Calendar}
-            bgColor="success"
-          />
-        </Col>
-      </Row>
-
-      <Row className="g-4 mb-4">
-        <Col lg={8}>
-          <Card title="Today's Appointments">
-            <DataTable
-              columns={appointmentColumns}
-              data={appointments}
-              loading={loading}
-              searchable
-              pageSize={10}
-            />
-          </Card>
-        </Col>
-
-        <Col lg={4}>
-          <Card title="Quick Actions">
-            <div className="d-grid gap-2">
-              <Button
-                variant="outline-primary"
-                onClick={() => setShowPatientModal(true)}
-              >
-                <UserPlus size={18} className="me-2" />
-                Register New Patient
-              </Button>
-              <Button
-                variant="outline-success"
-                onClick={() => setShowAppointmentModal(true)}
-              >
-                <Calendar size={18} className="me-2" />
-                Book Appointment
-              </Button>
-              <Button
-                variant="outline-info"
-                onClick={() => navigate("/patients")}
-              >
-                <Users size={18} className="me-2" />
-                Search Patient
-              </Button>
-            </div>
-          </Card>
-
-          <Card title="Queue Status" className="mt-3">
-            <div className="d-flex flex-column gap-2">
-              <div className="d-flex justify-content-between p-2 bg-light rounded">
-                <span>Waiting</span>
-                <Badge bg="warning">
-                  {appointments.filter((a) => a.status === "CHECKED_IN").length}
-                </Badge>
-              </div>
-              <div className="d-flex justify-content-between p-2 bg-light rounded">
-                <span>In Consultation</span>
-                <Badge bg="info">
-                  {
-                    appointments.filter((a) => a.status === "IN_CONSULTATION")
-                      .length
-                  }
-                </Badge>
-              </div>
-              <div className="d-flex justify-content-between p-2 bg-light rounded">
-                <span>Completed</span>
-                <Badge bg="success">
-                  {appointments.filter((a) => a.status === "COMPLETED").length}
-                </Badge>
-              </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      <Row className="g-4">
-        <Col lg={12}>
-          <Card title="Recent Patients">
-            <DataTable
-              columns={patientColumns}
-              data={patients}
-              loading={loading}
-              searchable
-              pageSize={10}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <Modal
-        show={showPatientModal}
-        onHide={() => setShowPatientModal(false)}
-        title="Register New Patient"
-        size="xl"
-      >
-        <PatientRegistrationForm
-          onSuccess={handlePatientSuccess}
-          onCancel={() => setShowPatientModal(false)}
-        />
-      </Modal>
-
-      <Modal
-        show={showAppointmentModal}
-        onHide={() => setShowAppointmentModal(false)}
-        title="Book Appointment"
-        size="lg"
-      >
-        <div className="p-4 text-center">
-          <p>Appointment booking form will be here</p>
-          <Button onClick={() => setShowAppointmentModal(false)}>Close</Button>
         </div>
-      </Modal>
-    </DashboardLayout>
-  );
-};
+      </div>
 
-export default ReceptionistDashboard;
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard
+          title="Today's Appointments"
+          value="48"
+          icon={Calendar}
+          color="purple"
+        />
+        <StatsCard title="Checked In" value="32" icon={Users} color="teal" />
+        <StatsCard title="Waiting" value="8" icon={Clock} color="orange" />
+        <StatsCard
+          title="Collections"
+          value="$8,340"
+          icon={DollarSign}
+          color="green"
+        />
+      </div>
+
+      {/* Patient Search */}
+      <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Patient Search</h2>
+        <div className="relative max-w-2xl">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, phone, or patient ID..."
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-hospital-purple focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Appointment Queue and Pending Payments */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Appointment Queue */}
+        <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Appointment Queue
+          </h2>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-hospital-purple rounded-lg flex items-center justify-center text-white font-bold">
+                    {i}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">John Doe</p>
+                    <p className="text-sm text-gray-600">
+                      Dr. Smith • 10:00 AM
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                  Waiting
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pending Payments */}
+        <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Pending Payments
+          </h2>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="p-4 bg-warning-50 border border-warning-200 rounded-lg"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium text-gray-900">
+                    Patient #{1000 + i}
+                  </p>
+                  <span className="font-bold text-warning-600">
+                    ${(Math.random() * 500 + 100).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="primary" className="flex-1">
+                    Collect Payment
+                  </Button>
+                  <Button size="sm" variant="outline" className="flex-1">
+                    View Invoice
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Doctor Availability */}
+      <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
+          Doctor Availability
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {["Dr. Smith", "Dr. Johnson", "Dr. Williams"].map((doctor, i) => (
+            <div
+              key={i}
+              className="p-4 bg-success-50 border border-success-200 rounded-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-success-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {doctor.split(" ")[1][0]}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">{doctor}</p>
+                  <p className="text-sm text-success-600">Available</p>
+                </div>
+              </div>
+              <div className="mt-3 text-sm text-gray-600">
+                <p>Next: 11:00 AM</p>
+                <p>Queue: 3 patients</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Patient Registration Modal */}
+      <Modal
+        title="Register New Patient"
+        isOpen={isRegisterModalOpen}
+        onClose={handleCloseRegister}
+      >
+        <PatientRegistrationForm onClose={handleCloseRegister} />
+      </Modal>
+    </div>
+  );
+}
+
