@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { Plus } from "../lib/icons";
 import { Button } from "../components/common/Button";
 
 export function Billing() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [invoices, setInvoices] = useState([
     {
@@ -56,7 +54,6 @@ export function Billing() {
 
   const handleCreateInvoice = (e) => {
     e.preventDefault();
-
     const balance =
       parseFloat(newInvoice.amount || 0) - parseFloat(newInvoice.paid || 0);
 
@@ -66,7 +63,7 @@ export function Billing() {
       balance,
     };
 
-    setInvoices([...invoices, newEntry]); // ✅ Add to table
+    setInvoices([...invoices, newEntry]);
     setNewInvoice({
       invoiceNo: "",
       patientName: "",
@@ -76,7 +73,7 @@ export function Billing() {
       date: "",
       status: "PENDING",
     });
-    setIsModalOpen(false); // Close modal
+    setIsModalOpen(false);
   };
 
   return (
@@ -99,87 +96,138 @@ export function Billing() {
       {/* ✅ Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-[420px] p-6 relative">
+          <div className="bg-white rounded-xl shadow-lg w-[600px] p-8 relative overflow-y-auto max-h-[90vh]">
             <button
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
               onClick={() => setIsModalOpen(false)}
             >
               ✕
             </button>
-            <h2 className="text-xl font-bold mb-4">Create New Invoice</h2>
+            <h2 className="text-2xl font-bold mb-6">Create New Invoice</h2>
 
-            <form className="space-y-3" onSubmit={handleCreateInvoice}>
-              <input
-                type="text"
-                placeholder="Invoice Number"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.invoiceNo}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, invoiceNo: e.target.value })
-                }
-                required
-              />
-              <input
-                type="text"
-                placeholder="Patient Name"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.patientName}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, patientName: e.target.value })
-                }
-                required
-              />
-              <input
-                type="text"
-                placeholder="Services"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.services}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, services: e.target.value })
-                }
-                required
-              />
-              <input
-                type="number"
-                placeholder="Amount"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.amount}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, amount: e.target.value })
-                }
-                required
-              />
-              <input
-                type="number"
-                placeholder="Paid"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.paid}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, paid: e.target.value })
-                }
-              />
-              <input
-                type="date"
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.date}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, date: e.target.value })
-                }
-                required
-              />
-              <select
-                className="w-full border rounded-lg p-2"
-                value={newInvoice.status}
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, status: e.target.value })
-                }
-              >
-                <option value="PENDING">Pending</option>
-                <option value="PARTIAL">Partial</option>
-                <option value="PAID">Paid</option>
-              </select>
+            <form className="space-y-4" onSubmit={handleCreateInvoice}>
+              {/* Invoice Number */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Invoice Number
+                </label>
+                <input
+                  type="text"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.invoiceNo}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, invoiceNo: e.target.value })
+                  }
+                  required
+                />
+              </div>
 
-              <Button type="submit">Add Invoice</Button>
+              {/* Patient Name */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Patient Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.patientName}
+                  onChange={(e) =>
+                    setNewInvoice({
+                      ...newInvoice,
+                      patientName: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              {/* Services */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Services
+                </label>
+                <input
+                  type="text"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.services}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, services: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {/* Amount */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Total Amount (₹)
+                </label>
+                <input
+                  type="number"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.amount}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, amount: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {/* Paid */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Amount Paid (₹)
+                </label>
+                <input
+                  type="number"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.paid}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, paid: e.target.value })
+                  }
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Invoice Date
+                </label>
+                <input
+                  type="date"
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.date}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, date: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">
+                  Payment Status
+                </label>
+                <select
+                  className="w-full border rounded-lg p-2"
+                  value={newInvoice.status}
+                  onChange={(e) =>
+                    setNewInvoice({ ...newInvoice, status: e.target.value })
+                  }
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="PARTIAL">Partial</option>
+                  <option value="PAID">Paid</option>
+                </select>
+              </div>
+
+              {/* Submit */}
+              <div className="pt-4">
+                <Button type="submit" className="w-full">
+                  Add Invoice
+                </Button>
+              </div>
             </form>
           </div>
         </div>
@@ -227,10 +275,3 @@ export function Billing() {
     </div>
   );
 }
-
-
-
-
-
-   
-

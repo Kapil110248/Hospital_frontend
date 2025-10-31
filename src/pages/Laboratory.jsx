@@ -1,19 +1,21 @@
+
+
 import { useState } from "react";
 import { FlaskConical, Search, Plus, FileCheck } from "../lib/icons";
 import { Button } from "../components/common/Button";
 import { DataTable } from "../components/common/DataTable";
+import { Modal } from "../components/common/Modal";
 
 export function Laboratory() {
   const [searchQuery, setSearchQuery] = useState("");
-
-  const labTests = [
+  const [labTests, setLabTests] = useState([
     {
       id: "1",
       testId: "LAB001",
       patientName: "John Doe",
       testType: "Complete Blood Count",
       orderedBy: "Dr. Sarah Wilson",
-      orderedDate: "2024-10-28",
+      orderedDate: "2025-10-28",
       status: "PENDING",
     },
     {
@@ -25,25 +27,15 @@ export function Laboratory() {
       orderedDate: "2024-10-28",
       status: "IN_PROGRESS",
     },
-    {
-      id: "3",
-      testId: "LAB003",
-      patientName: "Bob Johnson",
-      testType: "Thyroid Function Test",
-      orderedBy: "Dr. Emily Brown",
-      orderedDate: "2024-10-27",
-      status: "COMPLETED",
-    },
-    {
-      id: "4",
-      testId: "LAB004",
-      patientName: "Alice Williams",
-      testType: "HbA1c",
-      orderedBy: "Dr. David Lee",
-      orderedDate: "2024-10-27",
-      status: "COMPLETED",
-    },
-  ];
+  ]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    patientName: "",
+    testType: "",
+    orderedBy: "",
+    status: "PENDING",
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -60,6 +52,22 @@ export function Laboratory() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newOrder = {
+      id: Date.now().toString(),
+      testId: `LAB${(labTests.length + 1).toString().padStart(3, "0")}`,
+      patientName: formData.patientName,
+      testType: formData.testType,
+      orderedBy: formData.orderedBy,
+      orderedDate: new Date().toISOString().split("T")[0],
+      status: formData.status,
+    };
+    setLabTests([newOrder, ...labTests]);
+    setIsModalOpen(false);
+    setFormData({ patientName: "", testType: "", orderedBy: "", status: "PENDING" });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -70,26 +78,18 @@ export function Laboratory() {
           </h1>
           <p className="text-gray-600 mt-1">Manage lab tests and results</p>
         </div>
-        <Button icon={Plus}>Create Lab Order</Button>
+        <Button icon={Plus} onClick={() => setIsModalOpen(true)}>
+          Create Lab Order
+        </Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          {
-            label: "Total Today",
-            value: "32",
-            icon: FlaskConical,
-            color: "blue",
-          },
-          { label: "Pending", value: "8", icon: FlaskConical, color: "yellow" },
-          {
-            label: "In Progress",
-            value: "12",
-            icon: FlaskConical,
-            color: "purple",
-          },
-          { label: "Completed", value: "12", icon: FileCheck, color: "green" },
+          { label: "Total Today", value: labTests.length, icon: FlaskConical, color: "blue" },
+          { label: "Pending", value: labTests.filter(t => t.status === "PENDING").length, icon: FlaskConical, color: "yellow" },
+          { label: "In Progress", value: labTests.filter(t => t.status === "IN_PROGRESS").length, icon: FlaskConical, color: "purple" },
+          { label: "Completed", value: labTests.filter(t => t.status === "COMPLETED").length, icon: FileCheck, color: "green" },
         ].map((stat, index) => (
           <div
             key={index}
@@ -110,32 +110,6 @@ export function Laboratory() {
         ))}
       </div>
 
-      {/* Common Lab Tests */}
-      <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Common Lab Tests
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            "Complete Blood Count",
-            "Lipid Profile",
-            "Liver Function Test",
-            "Kidney Function Test",
-            "Thyroid Function Test",
-            "HbA1c",
-            "Blood Glucose",
-            "Urinalysis",
-          ].map((test, index) => (
-            <button
-              key={index}
-              className="px-4 py-2 bg-gray-50 hover:bg-blue-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              {test}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Lab Tests Table */}
       <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-soft p-6 border border-gray-100">
         <div className="flex items-center gap-4 mb-6">
@@ -152,7 +126,12 @@ export function Laboratory() {
         </div>
 
         <DataTable
-          data={labTests}
+          data={labTests.filter(
+            (t) =>
+              t.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              t.testType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              t.testId.toLowerCase().includes(searchQuery.toLowerCase())
+          )}
           columns={[
             { header: "Test ID", accessor: "testId" },
             { header: "Patient", accessor: "patientName" },
@@ -171,25 +150,73 @@ export function Laboratory() {
                 </span>
               ),
             },
-            {
-              header: "Actions",
-              accessor: (row) => (
-                <div className="flex items-center gap-2">
-                  {row.status === "COMPLETED" ? (
-                    <button className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                      View Results
-                    </button>
-                  ) : (
-                    <button className="px-3 py-1 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                      Update Status
-                    </button>
-                  )}
-                </div>
-              ),
-            },
           ]}
         />
       </div>
+
+      {/* Modal Form */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Create Lab Order"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Patient Name</label>
+            <input
+              type="text"
+              value={formData.patientName}
+              onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Test Type</label>
+            <input
+              type="text"
+              value={formData.testType}
+              onChange={(e) => setFormData({ ...formData, testType: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ordered By</label>
+            <input
+              type="text"
+              value={formData.orderedBy}
+              onChange={(e) => setFormData({ ...formData, orderedBy: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Status</label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+            >
+              <option value="PENDING">Pending</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" onClick={() => setIsModalOpen(false)} variant="secondary">
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
